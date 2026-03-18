@@ -45,7 +45,7 @@ Why this is vulnerable:
 ---
 
 ### 5) Command execution on request-derived input
-- `runCommandSafe()` executes input using `child_process.exec(input, ...)`.
+- `runCommand()` executes input using `child_process.exec(input, ...)`.
 - `/admin` supports command behavior when role has `cmd:` prefix.
 - `/debug` executes `req.query.cmd` when debug mode is enabled.
 
