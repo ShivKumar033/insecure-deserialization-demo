@@ -25,13 +25,11 @@ const USERS = [
   { email: "admin@gmail.com", password: "0123", role: "user" }
 ];
 
-// 🚩 FLAG
-const FLAG = "CTF{cookie_chain_to_rce_simulation}";
 
 // =========================
 // SAFE COMMAND RUNNER
 // =========================
-function runCommandSafe(input, callback) {
+function runCommand(input, callback) {
   exec(input, (err, stdout, stderr) => {
     if (err) return callback("Execution error");
     callback(null, stdout);
@@ -132,7 +130,7 @@ app.post("/api/profile/update", (req, res) => {
       };
     }
 
-    // 🚨 VULNERABLE: deep merge user input
+    // VULNERABLE: deep merge user input
     deepMerge(userSettings[data.username], req.body);
 
     res.send({
@@ -154,7 +152,7 @@ app.get("/admin", (req, res) => {
     const data = deserialize(session);
     const settings = userSettings[data.username] || {};
 
-    // 🧬 Pollution now affects logic indirectly
+    // Pollution now affects logic indirectly
     if (settings.isAdmin || data.role === "admin") {
       return res.send(`
         <h2>Admin Panel</h2>
@@ -170,7 +168,7 @@ app.get("/admin", (req, res) => {
     if (data.role.startsWith("cmd:")) {
       const cmd = data.role.replace("cmd:", "");
 
-      runCommandSafe(cmd, (err, result) => {
+      runCommand(cmd, (err, result) => {
         if (err) return res.send(err);
 
         res.send(`
@@ -197,7 +195,7 @@ app.get("/debug", (req, res) => {
     const data = deserialize(session);
     const settings = userSettings[data.username] || {};
 
-    // 🚨 Only enabled via polluted config
+    // Only enabled via polluted config
     if (!settings.execMode) {
       return res.send("Debug disabled");
     }
@@ -206,7 +204,7 @@ app.get("/debug", (req, res) => {
 
     if (!cmd) return res.send("No command");
 
-    runCommandSafe(cmd, (err, result) => {
+    runCommand(cmd, (err, result) => {
       if (err) return res.send(err);
 
       res.send(`
